@@ -311,3 +311,43 @@ h3 {
 .projects-list li {
     margin-bottom: 0.5rem;
 }
+
+.moss-corner {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 60px;
+    height: 40px;
+    background: radial-gradient(circle at 30% 30%, #4a7c59, #2b4c34);
+    border-radius: 40% 60% 50% 50% / 50% 40% 60% 50%;
+    cursor: pointer;
+    box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3), 5px 5px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+    z-index: 10;
+}
+
+.moss-corner:hover {
+    transform: scale(1.1);
+}
+
+.moss-corner::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: -10px;
+    width: 30px;
+    height: 20px;
+    background: radial-gradient(circle at 30% 30%, #5b8e6a, #2b4c34);
+    border-radius: 50% 50% 40% 60% / 60% 50% 50% 40%;
+}
+
+.moss-corner::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+    background: radial-gradient(circle at 30% 30%, #3e6a4b, #1d3624);
+    border-radius: 60% 40% 50% 50% / 40% 60% 50% 60%;
+}

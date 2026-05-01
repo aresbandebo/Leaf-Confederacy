@@ -32,6 +32,7 @@ const games = [
     { title: "Leaf Pong", url: "https://codepen.io/LEAFY_GREEN/embed/OPbJExm?default-tab=result" },
     { title: "Flappy Leaf", url: "https://codepen.io/LEAFY_GREEN/embed/GgNRwEx?default-tab=result" },
     { title: "Tiny Leaves", url: "https://codepen.io/LEAFY_GREEN/embed/VYmwVXr?default-tab=result" },
+    { title: "Leaf Thief Public Beta", url: "https://scratch.mit.edu/projects/1314417413/embed" },
     { title: "Leaf Blower Revolution", url: "https://gx.games/games/og14id/leaf-blower-revolution-idle-game/" }
 ];
 
@@ -110,8 +111,9 @@ function renderGames() {
         div.className = 'game-card';
         let content = '';
         
-        if (game.url.includes('codepen.io')) {
-            content = `<iframe src="${game.url}" width="100%" height="300" frameborder="0" allow="fullscreen" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>`;
+        if (game.url.includes('embed')) {
+            let height = game.url.includes('scratch') ? "402" : "300";
+            content = `<iframe src="${game.url}" width="100%" height="${height}" frameborder="0" allow="fullscreen" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>`;
         } else {
             content = `<div class="game-preview">🍃</div>`;
         }
