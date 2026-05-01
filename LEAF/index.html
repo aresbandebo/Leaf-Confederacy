@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Leaf Confederacy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="images/logo.png" alt="Leaf Confederacy Logo" class="nav-logo">
+            <span>Leaf Confederacy</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" data-target="home" class="active">Home</a></li>
+            <li><a href="#" data-target="signup">Sign Up</a></li>
+            <li><a href="#" data-target="games">Games</a></li>
+            <li><a href="#" data-target="community">Community</a></li>
+            <li><a href="#" data-target="info">Info</a></li>
+        </ul>
+    </nav>
+
+    <main id="app">
+        <!-- Sections will be toggled by JS -->
+        <section id="home" class="view active">
+            <div class="hero">
+                <img src="images/logo.png" alt="The Leaf Confederacy" class="hero-logo">
+                <h1>Welcome to The Leaf Confederacy!</h1>
+                <p class="hero-text">This is a community where all leaf lovers (and people who just want to be part of a fun group) can come together and share their exciting ideas!</p>
+                <p class="hero-text">The goal of this community is to create a group that will not only work together but create public web pages anyone in the community can access. This is a supportive space so please be nice to everyone and do not mess with public documents. Apart from that, have fun!</p>
+                
+                <div class="hero-actions">
+                    <button class="btn btn-primary" onclick="navigateTo('signup')">Join the Community</button>
+                    <button class="btn btn-secondary" onclick="navigateTo('games')">Play Games</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="signup" class="view">
+            <h2>Sign Up & Agreement</h2>
+            <div class="form-card">
+                <p class="agreement-text">By signing this form, you will be agreeing to the following terms. Anyone who breaks these terms is subject to removal from the community:</p>
+                <ul class="agreement-list">
+                    <li>You will respect all community google docs and not vandalise or make any major changes without permission from an owner.</li>
+                    <li>You will respect the choices and creations of all members in the community.</li>
+                    <li>You will unconditionally work with others in the Leaf Community whenever possible.</li>
+                    <li>You will not join the Union of Kaeden. They are our sworn enemies and we will fight them.</li>
+                </ul>
+                <p class="agreement-text">By accepting these conditions, you can access all of the creations of the Leaf Confederacy and can edit public documents. Please type your name and only your name into the box below if you want to become a part of the Leaf Community.</p>
+                
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label for="memberName">Your Name</label>
+                        <input type="text" id="memberName" required placeholder="Type your name here">
+                    </div>
+                    <div class="form-group">
+                        <label for="memberInfo">If you would like to add any information about yourself please add it here.</label>
+                        <textarea id="memberInfo" rows="4" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Sign Agreement</button>
+                </form>
+            </div>
+            
+            <div class="members-section">
+                <h3>Current Members</h3>
+                <div class="members-grid" id="membersList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <section id="games" class="view">
+            <h2>Leaf Games</h2>
+            <p>Play some of our amazing community-made leaf games right here! All the CodePen games are embedded below for you to play directly on this site.</p>
+            <div class="games-grid">
+                <!-- Games cards -->
+            </div>
+        </section>
+
+        <section id="community" class="view">
+            <h2>Community Board</h2>
+            <p>A place where anyone can ask questions and post their own sites that they want added to the website.</p>
+            <div class="community-form">
+                <form id="postForm">
+                    <div class="form-group">
+                        <input type="text" id="postTitle" placeholder="Title or Topic" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="postContent" rows="4" placeholder="Write your question or share a site..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Post</button>
+                </form>
+            </div>
+            <div class="posts-list" id="postsList">
+                <!-- Posts populated by JS -->
+            </div>
+        </section>
+
+        <section id="info" class="view">
+            <div class="info-block">
+                <h2>Goals</h2>
+                <p>Our current goal is to take down the Union. To do so, we will need to work together in four square and once we do, we can enact a secret plan.</p>
+            </div>
+            <div class="info-block">
+                <h2>Upcoming Projects</h2>
+                <ul class="projects-list">
+                    <li>Google site for the Leaf Confederacy</li>
+                    <li>Leaf Confederacy video</li>
+                    <li>Deltaleaf</li>
+                    <li>Leaf Wordle</li>
+                    <li>Whatsapp and iMessage group chat</li>
+                </ul>
+            </div>
+            <div class="info-block">
+                <h2>Messages to the Union</h2>
+                <div class="letter">
+                    <p>Dear Union,</p>
+                    <p>I see that you have spies in my confederacy. I want you to know that all spies will be allowed and considered to be members of the Confederacy of Leaves. I also want to clarify that the only fighting between us is in four squares and nothing else. We might be rivals but I respect your union and we have no harmful intentions.</p>
+                    <p>Thank you,</p>
+                    <p><strong>Ares Bandebo-Cambra</strong></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
