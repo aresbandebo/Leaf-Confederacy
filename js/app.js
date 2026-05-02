@@ -1,29 +1,10 @@
-// Initial data loaded from CSV
-const initialMembers = [
-  { name: "Creator: Ares Bandebo-Cambra", info: "Hi, I am the creator of the Leaf Confederacy. I hope you will all work hard to contribute to the community and I cannot wait to see your creations. " },
-  { name: "Yes(Athul the spy)", info: "no" },
-  { name: "Ben fierro wolf", info: "I hate tiny Pepe Caleb u should call him that he hates it also ares is my goat GO LEAFS" },
-  { name: "Angel Raúl Concha", info: "leaf" },
-  { name: "James", info: "" },
-  { name: "i signed", info: "moss." },
-  { name: "Phuoc Ha", info: "" },
-  { name: "Tom", info: "Hello" },
-  { name: "Ryker B. A. Shwartzton", info: "A wealthy investor dedicated to keeping his lawn in shape." },
-  { name: "zen", info: "HI" },
-  { name: "Paulina Sepulveda", info: "what is this? im very confused" },
-  { name: "I accept(Dante)", info: "googoogaga" },
-  { name: "Nikko", info: "Leaf" },
-  { name: "Jiahao", info: "ok" },
-  { name: "TUNG TUNG THOMAS", info: "my dih hurts" },
-  { name: "Elizabeth Wait", info: "I am Elizabeth, I like leaves and trees." },
-  { name: "sofia yelyashkevich", info: "yo what r the people in the union" },
-  { name: "6hank7", info: "i eat leafs" },
-  { name: "Perri Spayde", info: "amercian baddie paulina is latina baddie she just forgot to put it in her bio is this a cult?" },
-  { name: "Bronson", info: "You know me. im a good person to have on your team" },
-  { name: "ansophi", info: "leafs all the way" },
-  { name: "Laurel Sedgwick", info: "this is lwk dumb but ill have fomo otherwise." },
-  { name: "lyla", info: "im so awesome" }
-];
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1eoFd74CrjOyFa7waXbrLnDOkrOCCdsZruTEqju7WeBE/gviz/tq?tqx=out:csv&gid=1339113680';
+const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSd8aVRTjayYcGiXMmkG-u4GEVDzA0y02D_eLiKlKBw0PKjWLQ/formResponse';
+const ENTRY_NAME = 'entry.258904391';
+const ENTRY_INFO = 'entry.1474977758';
+
+let members = [];
+let posts = JSON.parse(localStorage.getItem('leafPosts')) || [];
 
 const games = [
     { title: "Leaf Blowing Rotation", url: "https://codepen.io/LEAFY_GREEN/embed/gbLOQqQ?default-tab=result" },
@@ -36,33 +17,56 @@ const games = [
     { title: "Leaf Blower Revolution", url: "https://gx.games/games/og14id/leaf-blower-revolution-idle-game/" }
 ];
 
-// Initialize State in Local Storage
-let members = JSON.parse(localStorage.getItem('leafMembers')) || initialMembers;
-let posts = JSON.parse(localStorage.getItem('leafPosts')) || [];
-
-// Clean up duplicate or slight variations of Ares' name
-const uniqueMembers = [];
-const seenNames = new Set();
-members.forEach(member => {
-    // Manually filter out any extra version of the creator's name
-    if (member.name !== "Creator: Ares Bandebo-Cambra" && 
-        member.name.toLowerCase().includes("ares") && 
-        (member.name.toLowerCase().includes("bandebo") || member.name.toLowerCase().includes("cambra") || member.name.trim().toLowerCase() === "ares")) {
-        return; // Skip this duplicate
+// Fetch members from Google Sheet
+async function fetchAndSyncMembers() {
+    try {
+        const response = await fetch(SHEET_CSV_URL);
+        const csvText = await response.text();
+        
+        Papa.parse(csvText, {
+            header: false,
+            complete: function(results) {
+                const rows = results.data.slice(1); // skip header
+                const sheetMembers = rows.map(row => ({
+                    name: row[1] ? row[1].trim() : "",
+                    info: row[2] ? row[2].trim() : ""
+                })).filter(m => m.name !== "");
+                
+                members = sheetMembers;
+                renderMembers();
+                
+                // Auto-sync any locally signed-up users to the global Google Form
+                let localMembers = JSON.parse(localStorage.getItem('leafMembers')) || [];
+                localMembers.forEach(localMem => {
+                    const exists = sheetMembers.find(sm => sm.name.toLowerCase() === localMem.name.toLowerCase());
+                    if (!exists) {
+                        submitToGoogleForm(localMem.name, localMem.info || "");
+                    }
+                });
+            }
+        });
+    } catch(err) {
+        console.error("Error fetching members:", err);
     }
-
-    if (!seenNames.has(member.name)) {
-        seenNames.add(member.name);
-        uniqueMembers.push(member);
-    }
-});
-members = uniqueMembers;
-localStorage.setItem('leafMembers', JSON.stringify(members));
-
-// Save initial members to localStorage if it was empty
-if (!localStorage.getItem('leafMembers')) {
-    localStorage.setItem('leafMembers', JSON.stringify(initialMembers));
 }
+
+function submitToGoogleForm(name, info) {
+    const formData = new URLSearchParams();
+    formData.append(ENTRY_NAME, name);
+    formData.append(ENTRY_INFO, info);
+    
+    fetch(FORM_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData.toString()
+    }).catch(e => console.error("Error syncing", name, e));
+}
+
+// Start fetching right away
+fetchAndSyncMembers();
 
 // Navigation logic for SPA
 document.querySelectorAll('.nav-links a').forEach(link => {
@@ -159,11 +163,20 @@ document.getElementById('signupForm').addEventListener('submit', (e) => {
     const info = document.getElementById('memberInfo').value;
     
     if (name) {
+        // Show immediately locally
         members.push({ name, info });
-        localStorage.setItem('leafMembers', JSON.stringify(members));
         renderMembers();
+        
+        // Save to local storage for the background auto-sync feature
+        let localMembers = JSON.parse(localStorage.getItem('leafMembers')) || [];
+        localMembers.push({ name, info });
+        localStorage.setItem('leafMembers', JSON.stringify(localMembers));
+        
+        // Send to Google Form in the background
+        submitToGoogleForm(name, info);
+        
         document.getElementById('signupForm').reset();
-        alert('Welcome to The Leaf Confederacy!');
+        alert('Welcome to The Leaf Confederacy! Your name has been globally synced.');
     }
 });
 
