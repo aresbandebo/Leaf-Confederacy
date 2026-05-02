@@ -28,12 +28,28 @@ async function fetchAndSyncMembers() {
             header: false,
             complete: function(results) {
                 const rows = results.data.slice(1); // skip header
-                const sheetMembers = rows.map(row => ({
-                    name: row[1] ? row[1].trim() : "",
-                    info: row[2] ? row[2].trim() : ""
-                })).filter(m => m.name !== "");
+                
+                const sheetMembers = [];
+                const sheetPosts = [];
+                
+                rows.forEach(row => {
+                    let timestamp = row[0] ? row[0].trim() : "";
+                    let name = row[1] ? row[1].trim() : "";
+                    let info = row[2] ? row[2].trim() : "";
+                    
+                    if (name.startsWith("POST: ")) {
+                        sheetPosts.push({
+                            title: name.substring(6),
+                            content: info,
+                            timestamp: timestamp
+                        });
+                    } else if (name !== "") {
+                        sheetMembers.push({ name, info });
+                    }
+                });
                 
                 members = [...sheetMembers];
+                posts = [...sheetPosts];
                 
                 // Auto-sync any locally signed-up users to the global Google Form
                 // and keep them visible on the screen if Google Sheets is still processing the CSV cache
@@ -54,7 +70,23 @@ async function fetchAndSyncMembers() {
                 // Cleanup local storage to only keep the pending ones
                 localStorage.setItem('leafMembers', JSON.stringify(pendingLocals));
                 
+                // Auto-sync any local community posts
+                let localPosts = JSON.parse(localStorage.getItem('leafPosts')) || [];
+                let pendingPosts = [];
+                
+                localPosts.forEach(localPost => {
+                    const exists = sheetPosts.find(sp => sp.title === localPost.title && sp.content === localPost.content);
+                    if (!exists) {
+                        submitToGoogleForm("POST: " + localPost.title, localPost.content);
+                        posts.push(localPost);
+                        pendingPosts.push(localPost);
+                    }
+                });
+                
+                localStorage.setItem('leafPosts', JSON.stringify(pendingPosts));
+                
                 renderMembers();
+                renderPosts();
             }
         });
     } catch(err) {
@@ -158,7 +190,7 @@ function renderPosts() {
     [...posts].reverse().forEach(post => {
         const div = document.createElement('div');
         div.className = 'post-card';
-        const date = new Date(post.timestamp).toLocaleString();
+        const date = typeof post.timestamp === 'number' ? new Date(post.timestamp).toLocaleString() : post.timestamp;
         div.innerHTML = `
             <h4>${escapeHTML(post.title)}</h4>
             <div class="post-meta">Posted on ${date}</div>
@@ -198,10 +230,18 @@ document.getElementById('postForm').addEventListener('submit', (e) => {
     const content = document.getElementById('postContent').value;
     
     if (title && content) {
-        posts.push({ title, content, timestamp: Date.now() });
-        localStorage.setItem('leafPosts', JSON.stringify(posts));
+        const newPost = { title, content, timestamp: Date.now() };
+        posts.push(newPost);
         renderPosts();
+        
+        let localPosts = JSON.parse(localStorage.getItem('leafPosts')) || [];
+        localPosts.push(newPost);
+        localStorage.setItem('leafPosts', JSON.stringify(localPosts));
+        
+        submitToGoogleForm("POST: " + title, content);
+        
         document.getElementById('postForm').reset();
+        alert('Your post has been globally synced to the Community Board!');
     }
 });
 
