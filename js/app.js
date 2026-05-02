@@ -20,7 +20,8 @@ const games = [
 // Fetch members from Google Sheet
 async function fetchAndSyncMembers() {
     try {
-        const response = await fetch(SHEET_CSV_URL);
+        // Add a timestamp cache-buster to force the browser to get the freshest data
+        const response = await fetch(SHEET_CSV_URL + '&t=' + Date.now());
         const csvText = await response.text();
         
         Papa.parse(csvText, {
@@ -32,17 +33,28 @@ async function fetchAndSyncMembers() {
                     info: row[2] ? row[2].trim() : ""
                 })).filter(m => m.name !== "");
                 
-                members = sheetMembers;
-                renderMembers();
+                members = [...sheetMembers];
                 
                 // Auto-sync any locally signed-up users to the global Google Form
+                // and keep them visible on the screen if Google Sheets is still processing the CSV cache
                 let localMembers = JSON.parse(localStorage.getItem('leafMembers')) || [];
+                let pendingLocals = [];
+                
                 localMembers.forEach(localMem => {
                     const exists = sheetMembers.find(sm => sm.name.toLowerCase() === localMem.name.toLowerCase());
                     if (!exists) {
+                        // Resubmit in background just in case
                         submitToGoogleForm(localMem.name, localMem.info || "");
+                        // Add them to the visible members list so they don't disappear while Google Sheets updates
+                        members.push(localMem);
+                        pendingLocals.push(localMem);
                     }
                 });
+                
+                // Cleanup local storage to only keep the pending ones
+                localStorage.setItem('leafMembers', JSON.stringify(pendingLocals));
+                
+                renderMembers();
             }
         });
     } catch(err) {
