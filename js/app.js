@@ -90,7 +90,10 @@ async function renderLeafOfTheDay() {
     if (leaf.name.includes("The ") && leaf.name.includes(" Leaf")) return;
     
     try {
-        const searchTerm = encodeURIComponent(leaf.name + ' close up');
+        // Strip out the word "Leaf" to get better search results on Wikimedia Commons
+        const coreName = leaf.name.replace(" Leaf", "");
+        // Append filetype:bitmap to strictly prevent it from returning PDFs or text documents
+        const searchTerm = encodeURIComponent(coreName + ' filetype:bitmap');
         const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=${searchTerm}&gsrlimit=1&prop=imageinfo&iiprop=url&format=json&origin=*`;
         
         const res = await fetch(url);
