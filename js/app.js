@@ -6,6 +6,80 @@ const ENTRY_INFO = 'entry.1474977758';
 let members = [];
 let posts = JSON.parse(localStorage.getItem('leafPosts')) || [];
 
+const leavesDB = [
+    { name: "Oak Leaf", emoji: "🍂", description: "A deeply lobed leaf from the mighty oak tree, often turning brilliant colors in the fall.", representation: "Strength, endurance, and deep, unshakeable roots within the community." },
+    { name: "Maple Leaf", emoji: "🍁", description: "A broad leaf with pointed lobes, famous for its vivid red and orange autumn displays.", representation: "Balance, promise, and the sweet rewards of patience." },
+    { name: "Willow Leaf", emoji: "🌿", description: "Long, slender leaves that drape elegantly from the weeping willow's branches.", representation: "Flexibility, adaptability, and the ability to bend without breaking in the wind." },
+    { name: "Ginkgo Leaf", emoji: "🍃", description: "A unique, fan-shaped leaf from an ancient tree species that has survived for millions of years.", representation: "Longevity, resilience, and a connection to the ancient past." },
+    { name: "Mint Leaf", emoji: "🌱", description: "A small, textured leaf with a famously refreshing and cool aroma.", representation: "Clarity, revitalization, and bringing fresh ideas to the table." },
+    { name: "Monstera Leaf", emoji: "🪴", description: "A large, tropical leaf characterized by its natural holes and splits.", representation: "Growth, uniqueness, and finding beauty in our imperfections." },
+    { name: "Four-Leaf Clover", emoji: "🍀", description: "A rare variation of the common three-leaved clover.", representation: "Uncommon luck, hope, faith, and love." },
+    { name: "Pine Needle", emoji: "🌲", description: "Thin, sharp leaves that stays green through the harshest of winters.", representation: "Steadfastness, eternal youth, and remaining true to oneself in all seasons." },
+    { name: "Eucalyptus Leaf", emoji: "🐨", description: "A fragrant, slightly curved, silvery-green leaf.", representation: "Healing, protection, and purifying the air around us." },
+    { name: "Fern Frond", emoji: "🌿", description: "A complex, feathery leaf that unrolls from a tight spiral as it grows.", representation: "New beginnings, endless fascination, and complex beauty." },
+    { name: "Bay Leaf", emoji: "🍲", description: "An aromatic leaf often used to add depth and flavor to stews.", representation: "Victory, success, and the subtle spices of life." },
+    { name: "Lotus Leaf", emoji: "🪷", description: "A large, water-repellent leaf that floats gracefully on ponds.", representation: "Purity, rising above the muddy waters, and spiritual awakening." },
+    { name: "Olive Leaf", emoji: "🕊️", description: "A small, silvery-green leaf from the ancient olive tree.", representation: "Peace, reconciliation, and extending a hand in friendship." },
+    { name: "Birch Leaf", emoji: "🍃", description: "A small, heart-shaped leaf with jagged edges from a white-barked tree.", representation: "Renewal, pioneering spirit, and lighting the way for others." },
+    { name: "Holly Leaf", emoji: "🎄", description: "A dark green, glossy leaf with sharp, prickly edges.", representation: "Protection, foresight, and enduring through the dark half of the year." },
+    { name: "Banana Leaf", emoji: "🍌", description: "A massive, flexible leaf used in many cultures for cooking and shelter.", representation: "Generosity, utility, and wrapping others in care." },
+    { name: "Palm Frond", emoji: "🌴", description: "A large, sweeping leaf from a tropical palm tree.", representation: "Victory, triumph, and the relaxing breeze of a warm day." },
+    { name: "Ivy Leaf", emoji: "🌿", description: "A lobed, evergreen leaf that climbs and clings to any surface.", representation: "Fidelity, eternal life, and strong, unbreakable attachments." },
+    { name: "Basil Leaf", emoji: "🍝", description: "A smooth, tender leaf with a sweet and peppery aroma.", representation: "Good wishes, love, and adding flavor to the community." },
+    { name: "Sycamore Leaf", emoji: "🍂", description: "A large, broad leaf from a massive shade tree.", representation: "Protection, shelter, and providing comfort to those in need." },
+    { name: "Tea Leaf", emoji: "🍵", description: "The small, serrated leaf responsible for the world's most popular beverage.", representation: "Calmness, reflection, and taking time to sit and think." },
+    { name: "Bamboo Leaf", emoji: "🎋", description: "A long, narrow leaf from the fastest-growing grass in the world.", representation: "Resilience, continuous growth, and graceful flexibility." },
+    { name: "Chestnut Leaf", emoji: "🌰", description: "A large, toothed leaf from a nut-bearing tree.", representation: "Provision, foresight, and gathering resources for the future." },
+    { name: "Fig Leaf", emoji: "🌿", description: "A deeply lobed, rough-textured leaf from an ancient fruit tree.", representation: "Modesty, enlightenment, and uncovering hidden truths." },
+    { name: "Acacia Leaf", emoji: "🦒", description: "A compound leaf made of many tiny, feathery leaflets.", representation: "Endurance, immortality, and surviving in harsh conditions." },
+    { name: "Rosemary Leaf", emoji: "🌿", description: "A needle-like leaf with a powerful, woody scent.", representation: "Remembrance, loyalty, and unforgettable memories." },
+    { name: "Sage Leaf", emoji: "🌱", description: "A soft, velvety leaf with a grayish-green hue.", representation: "Wisdom, long life, and clearing away negative energy." },
+    { name: "Ash Leaf", emoji: "🌳", description: "A compound leaf composed of multiple leaflets arranged opposite each other.", representation: "Connection, universal harmony, and bridging the gap between worlds." },
+    { name: "Elm Leaf", emoji: "🍃", description: "An asymmetrical leaf with a serrated edge.", representation: "Intuition, inner strength, and trusting your gut feeling." },
+    { name: "Cedar Leaf", emoji: "🌲", description: "Scale-like leaves that form flat, aromatic sprays.", representation: "Healing, purification, and ancient wisdom." },
+    { name: "Magnolia Leaf", emoji: "🌸", description: "A thick, glossy, leathery leaf with a rusty brown underside.", representation: "Nobility, perseverance, and a love of nature." },
+    { name: "Poplar Leaf", emoji: "🍂", description: "A triangular leaf that flutters and shimmers in the slightest breeze.", representation: "Communication, whispering secrets, and staying attuned to the wind." },
+    { name: "Cypress Leaf", emoji: "🌲", description: "Tiny, scale-like leaves covering rounded shoots.", representation: "Transition, mourning, and finding peace in change." },
+    { name: "Alder Leaf", emoji: "🍃", description: "A rounded leaf with a serrated edge, often found near water.", representation: "Confidence, facing emotions, and embracing the flow of life." },
+    { name: "Hazel Leaf", emoji: "🌰", description: "A soft, rounded leaf from a shrub known for its nuts and flexible wood.", representation: "Inspiration, creativity, and finding hidden knowledge." },
+    { name: "Rowan Leaf", emoji: "🍒", description: "A pinnate leaf with many small, serrated leaflets.", representation: "Protection, courage, and warding off negativity." },
+    { name: "Hawthorn Leaf", emoji: "🌿", description: "A deeply lobed leaf from a thorny shrub with beautiful spring blossoms.", representation: "Hope, protection, and the opening of the heart." },
+    { name: "Apple Leaf", emoji: "🍎", description: "A simple, oval leaf with a finely toothed edge.", representation: "Love, healing, and the sweet fruits of hard work." },
+    { name: "Cherry Leaf", emoji: "🍒", description: "A pointed, serrated leaf that turns beautiful colors in the autumn.", representation: "The fleeting nature of life and appreciating the present moment." },
+    { name: "Walnut Leaf", emoji: "🌰", description: "A large compound leaf with an aromatic scent.", representation: "Mental clarity, hidden wisdom, and unlocking the mind." },
+    { name: "Lemon Leaf", emoji: "🍋", description: "A glossy, dark green leaf with a subtle citrus scent.", representation: "Zest for life, cleansing energy, and a sunny disposition." },
+    { name: "Cinnamon Leaf", emoji: "🍂", description: "A thick, leathery leaf from the tree that gives us a beloved spice.", representation: "Warmth, protection, and adding a little spice to life." },
+    { name: "Patchouli Leaf", emoji: "🌿", description: "A member of the mint family with a strong, earthy, and musky scent.", representation: "Grounding, physical connection, and earthy passion." },
+    { name: "Lavender Leaf", emoji: "🪻", description: "A narrow, silvery-green leaf from a plant famous for its calming purple flowers.", representation: "Tranquility, devotion, and bringing peace to the chaotic mind." },
+    { name: "Dandelion Leaf", emoji: "🌼", description: "A deeply toothed leaf, often considered a weed but packed with nutrients.", representation: "Survival, stubborn resilience, and thriving wherever you land." },
+    { name: "The Golden Leaf", emoji: "✨", description: "A mythical leaf said to fall from the highest branch of the World Tree.", representation: "Ultimate wisdom, rare destiny, and the realization of one's full potential." },
+    { name: "The Cosmic Leaf", emoji: "🌌", description: "A leaf formed from stardust, drifting through the vacuum of space.", representation: "Infinite possibilities, vast imagination, and seeing the bigger picture." },
+    { name: "The Crystal Leaf", emoji: "💎", description: "A delicate, transparent leaf carved from a single, flawless gemstone.", representation: "Clarity of purpose, unbreakable resolve, and reflecting the truth." },
+    { name: "The Shadow Leaf", emoji: "🌑", description: "A leaf that absorbs light, found only in the deepest, oldest forests.", representation: "Mystery, embracing the unknown, and finding comfort in the quiet." },
+    { name: "The Rainbow Leaf", emoji: "🌈", description: "A legendary leaf that shimmers with every color of the spectrum.", representation: "Diversity, harmony, and the beautiful culmination of all things." }
+];
+
+function getLeafOfTheDay() {
+    const today = new Date();
+    // Seed string based on the date so it's the exact same for everyone on the planet
+    const seedStr = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+    let hash = 0;
+    for (let i = 0; i < seedStr.length; i++) {
+        hash = ((hash << 5) - hash) + seedStr.charCodeAt(i);
+        hash |= 0;
+    }
+    const index = Math.abs(hash) % leavesDB.length;
+    return leavesDB[index];
+}
+
+function renderLeafOfTheDay() {
+    const leaf = getLeafOfTheDay();
+    document.getElementById('lotd-name').textContent = leaf.name;
+    document.getElementById('lotd-emoji').textContent = leaf.emoji;
+    document.getElementById('lotd-desc').textContent = leaf.description;
+    document.getElementById('lotd-rep').textContent = leaf.representation;
+}
+
 const games = [
     { title: "Leaf Blowing Rotation", url: "https://codepen.io/LEAFY_GREEN/embed/gbLOQqQ?default-tab=result" },
     { title: "Leaftris", url: "https://codepen.io/LEAFY_GREEN/embed/GgNRwaw?default-tab=result" },
@@ -262,3 +336,4 @@ function escapeHTML(str) {
 renderMembers();
 renderGames();
 renderPosts();
+renderLeafOfTheDay();

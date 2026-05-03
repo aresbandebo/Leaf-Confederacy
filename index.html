@@ -21,6 +21,7 @@
             <li><a href="#" data-target="community">Community</a></li>
             <li><a href="#" data-target="chat">Chat</a></li>
             <li><a href="#" data-target="info">Info</a></li>
+            <li><a href="#" data-target="lotd">Leaf of the Day</a></li>
         </ul>
     </nav>
 
@@ -136,6 +137,19 @@
             </div>
             
             <div class="moss-corner" title="Moss" onclick="alert('You ate the moss.\nYour HP was maxed out.')"></div>
+        </section>
+
+        <section id="lotd" class="view">
+            <h2>Leaf Of The Day</h2>
+            <div class="info-block" id="lotd-container" style="text-align: center;">
+                <h3 id="lotd-name" style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--primary-color);">Loading...</h3>
+                <div id="lotd-emoji" style="font-size: 6rem; margin: 1.5rem 0; text-shadow: 0 10px 20px rgba(0,0,0,0.1);">🍃</div>
+                <p id="lotd-desc" style="font-size: 1.2rem; font-style: italic; margin-bottom: 2rem; color: #555;">Discovering today's leaf...</p>
+                <div style="background: #fff9f0; padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--primary-color); text-align: left; max-width: 600px; margin: 0 auto;">
+                    <strong style="color: var(--primary-color); display: block; margin-bottom: 0.5rem; font-size: 1.1rem;">What it represents:</strong>
+                    <p id="lotd-rep" style="line-height: 1.6;">...</p>
+                </div>
+            </div>
         </section>
     </main>
 
