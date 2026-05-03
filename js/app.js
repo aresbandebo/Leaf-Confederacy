@@ -72,12 +72,46 @@ function getLeafOfTheDay() {
     return leavesDB[index];
 }
 
-function renderLeafOfTheDay() {
+async function renderLeafOfTheDay() {
     const leaf = getLeafOfTheDay();
     document.getElementById('lotd-name').textContent = leaf.name;
-    document.getElementById('lotd-emoji').textContent = leaf.emoji;
     document.getElementById('lotd-desc').textContent = leaf.description;
     document.getElementById('lotd-rep').textContent = leaf.representation;
+    
+    const emojiEl = document.getElementById('lotd-emoji');
+    const imgEl = document.getElementById('lotd-image');
+    
+    // Set emoji as default
+    emojiEl.textContent = leaf.emoji;
+    emojiEl.style.display = 'block';
+    imgEl.style.display = 'none';
+    
+    // Skip real image search for mythical leaves
+    if (leaf.name.includes("The ") && leaf.name.includes(" Leaf")) return;
+    
+    try {
+        const searchTerm = encodeURIComponent(leaf.name + ' close up');
+        const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=${searchTerm}&gsrlimit=1&prop=imageinfo&iiprop=url&format=json&origin=*`;
+        
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (data && data.query && data.query.pages) {
+            const pages = data.query.pages;
+            const firstPageId = Object.keys(pages)[0];
+            const imageUrl = pages[firstPageId].imageinfo[0].url;
+            
+            if (imageUrl) {
+                imgEl.src = imageUrl;
+                imgEl.onload = () => {
+                    emojiEl.style.display = 'none';
+                    imgEl.style.display = 'block';
+                };
+            }
+        }
+    } catch(err) {
+        console.error("Could not fetch real image for leaf:", err);
+    }
 }
 
 const games = [
