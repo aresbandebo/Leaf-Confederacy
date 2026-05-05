@@ -430,6 +430,31 @@ document.getElementById('adminLoginBtn').addEventListener('click', () => {
     }
 });
 
+// Secret option to clear members and posts client-side only
+let secretClickCount = 0;
+let secretClickTimer;
+const headerTitle = document.querySelector('header h1');
+if (headerTitle) {
+    headerTitle.addEventListener('click', () => {
+        secretClickCount++;
+        clearTimeout(secretClickTimer);
+        
+        if (secretClickCount === 5) {
+            // Client-side ONLY clear
+            members = [];
+            posts = [];
+            renderMembers();
+            renderPosts();
+            alert("Secret Activated: All members and community posts have been hidden from your screen.");
+            secretClickCount = 0;
+        } else {
+            secretClickTimer = setTimeout(() => {
+                secretClickCount = 0;
+            }, 1000);
+        }
+    });
+}
+
 document.getElementById('storyForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const title = document.getElementById('storyTitleInput').value;
