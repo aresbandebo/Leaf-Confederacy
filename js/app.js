@@ -6,6 +6,7 @@ const ENTRY_INFO = 'entry.1474977758';
 let members = [];
 let posts = JSON.parse(localStorage.getItem('leafPosts')) || [];
 let stories = JSON.parse(localStorage.getItem('leafStories')) || [];
+let admins = [];
 
 const leavesDB = [
     { name: "Oak Leaf", emoji: "🍂", description: "A deeply lobed leaf from the mighty oak tree, often turning brilliant colors in the fall.", representation: "Strength, endurance, and deep, unshakeable roots within the community." },
@@ -144,6 +145,7 @@ async function fetchAndSyncMembers() {
                 const sheetMembers = [];
                 const sheetPosts = [];
                 const sheetStories = [];
+                const sheetAdmins = [];
                 
                 rows.forEach(row => {
                     let timestamp = row[0] ? row[0].trim() : "";
@@ -162,6 +164,8 @@ async function fetchAndSyncMembers() {
                             content: info,
                             timestamp: timestamp
                         });
+                    } else if (name.startsWith("ADMIN: ")) {
+                        sheetAdmins.push(name.substring(7).trim().toLowerCase());
                     } else if (name !== "") {
                         sheetMembers.push({ name, info });
                     }
@@ -170,6 +174,7 @@ async function fetchAndSyncMembers() {
                 members = [...sheetMembers];
                 posts = [...sheetPosts];
                 stories = [...sheetStories];
+                admins = [...sheetAdmins];
                 
                 // Auto-sync any locally signed-up users to the global Google Form
                 // and keep them visible on the screen if Google Sheets is still processing the CSV cache
@@ -404,13 +409,12 @@ document.getElementById('postForm').addEventListener('submit', (e) => {
 });
 
 document.getElementById('adminLoginBtn').addEventListener('click', () => {
-    const pwd = prompt("Please enter the Admin Password:");
-    // Simple admin password lock
-    if (pwd === "LeafStory2026" || pwd === "Confederacy") {
+    const adminName = prompt("Please enter your exact Name to verify Admin access:");
+    if (adminName && admins.includes(adminName.trim().toLowerCase())) {
         document.getElementById('admin-panel').style.display = 'block';
         document.getElementById('adminLoginBtn').style.display = 'none';
-    } else if (pwd !== null) {
-        alert("Incorrect password.");
+    } else if (adminName !== null) {
+        alert("Sorry, that name is not listed as an Admin in the Google Sheet. Ask the owner to add 'ADMIN: Your Name' to the sheet.");
     }
 });
 
