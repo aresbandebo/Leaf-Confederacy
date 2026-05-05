@@ -430,14 +430,12 @@ document.getElementById('adminLoginBtn').addEventListener('click', () => {
     }
 });
 
-// Secret console command to clear members and posts client-side only
-window.hideAll = function() {
-    members = [];
-    posts = [];
-    renderMembers();
-    renderPosts();
-    console.log("%cSecret Activated: All members and community posts have been hidden locally.", "color: green; font-weight: bold; font-size: 14px;");
-    return "Screen cleared.";
+// Secret console command to permanently erase all local client-side data
+window.eraseLocalData = function() {
+    localStorage.clear();
+    console.log("%cSecret Activated: All local client-side data (including pending posts and admin tokens) has been erased.", "color: red; font-weight: bold; font-size: 14px;");
+    location.reload();
+    return "Local data erased.";
 };
 
 document.getElementById('storyForm').addEventListener('submit', (e) => {
