@@ -6,7 +6,6 @@ const ENTRY_INFO = 'entry.1474977758';
 let members = [];
 let posts = JSON.parse(localStorage.getItem('leafPosts')) || [];
 let stories = JSON.parse(localStorage.getItem('leafStories')) || [];
-let admins = [];
 
 const leavesDB = [
     { name: "Oak Leaf", emoji: "🍂", description: "A deeply lobed leaf from the mighty oak tree, often turning brilliant colors in the fall.", representation: "Strength, endurance, and deep, unshakeable roots within the community." },
@@ -145,7 +144,6 @@ async function fetchAndSyncMembers() {
                 const sheetMembers = [];
                 const sheetPosts = [];
                 const sheetStories = [];
-                const sheetAdmins = [];
                 
                 rows.forEach(row => {
                     let timestamp = row[0] ? row[0].trim() : "";
@@ -164,8 +162,6 @@ async function fetchAndSyncMembers() {
                             content: info,
                             timestamp: timestamp
                         });
-                    } else if (name.startsWith("ADMIN: ")) {
-                        sheetAdmins.push(name.substring(7).trim().toLowerCase());
                     } else if (name !== "") {
                         sheetMembers.push({ name, info });
                     }
@@ -174,7 +170,6 @@ async function fetchAndSyncMembers() {
                 members = [...sheetMembers];
                 posts = [...sheetPosts];
                 stories = [...sheetStories];
-                admins = [...sheetAdmins];
                 
                 // Auto-sync any locally signed-up users to the global Google Form
                 // and keep them visible on the screen if Google Sheets is still processing the CSV cache
@@ -409,12 +404,29 @@ document.getElementById('postForm').addEventListener('submit', (e) => {
 });
 
 document.getElementById('adminLoginBtn').addEventListener('click', () => {
-    const adminName = prompt("Please enter your exact Name to verify Admin access:");
-    if (adminName && admins.includes(adminName.trim().toLowerCase())) {
+    // Check if they already have the golden ticket cookie
+    if (localStorage.getItem('isLeafAdmin') === 'true') {
         document.getElementById('admin-panel').style.display = 'block';
         document.getElementById('adminLoginBtn').style.display = 'none';
-    } else if (adminName !== null) {
-        alert("Sorry, that name is not listed as an Admin in the Google Sheet. Ask the owner to add 'ADMIN: Your Name' to the sheet.");
+        return;
+    }
+    
+    // Check if the temporary window is open
+    const today = new Date();
+    // Month is 0-indexed in Javascript (4 = May)
+    if (today.getFullYear() === 2026 && today.getMonth() === 4 && today.getDate() === 5) {
+        const pwd = prompt("The admin window is OPEN! Please enter the temporary password:");
+        if (pwd === "GoldenLeaf") {
+            // Give them the permanent cookie
+            localStorage.setItem('isLeafAdmin', 'true');
+            alert("Success! You have been granted permanent Admin access on this device.");
+            document.getElementById('admin-panel').style.display = 'block';
+            document.getElementById('adminLoginBtn').style.display = 'none';
+        } else if (pwd !== null) {
+            alert("Incorrect password.");
+        }
+    } else {
+        alert("The admin registration window is currently closed.");
     }
 });
 
