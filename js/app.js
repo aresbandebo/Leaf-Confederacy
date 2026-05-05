@@ -430,30 +430,15 @@ document.getElementById('adminLoginBtn').addEventListener('click', () => {
     }
 });
 
-// Secret option to clear members and posts client-side only
-let secretClickCount = 0;
-let secretClickTimer;
-const secretTarget = document.querySelector('.hero h1');
-if (secretTarget) {
-    secretTarget.addEventListener('click', () => {
-        secretClickCount++;
-        clearTimeout(secretClickTimer);
-        
-        if (secretClickCount === 5) {
-            // Client-side ONLY clear
-            members = [];
-            posts = [];
-            renderMembers();
-            renderPosts();
-            alert("Secret Activated: All members and community posts have been hidden from your screen.");
-            secretClickCount = 0;
-        } else {
-            secretClickTimer = setTimeout(() => {
-                secretClickCount = 0;
-            }, 3000); // Increased from 1 second to 3 seconds for easier tapping
-        }
-    });
-}
+// Secret console command to clear members and posts client-side only
+window.hideAll = function() {
+    members = [];
+    posts = [];
+    renderMembers();
+    renderPosts();
+    console.log("%cSecret Activated: All members and community posts have been hidden locally.", "color: green; font-weight: bold; font-size: 14px;");
+    return "Screen cleared.";
+};
 
 document.getElementById('storyForm').addEventListener('submit', (e) => {
     e.preventDefault();
