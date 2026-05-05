@@ -433,9 +433,9 @@ document.getElementById('adminLoginBtn').addEventListener('click', () => {
 // Secret option to clear members and posts client-side only
 let secretClickCount = 0;
 let secretClickTimer;
-const headerTitle = document.querySelector('header h1');
-if (headerTitle) {
-    headerTitle.addEventListener('click', () => {
+const secretTarget = document.querySelector('.hero h1');
+if (secretTarget) {
+    secretTarget.addEventListener('click', () => {
         secretClickCount++;
         clearTimeout(secretClickTimer);
         
@@ -450,7 +450,7 @@ if (headerTitle) {
         } else {
             secretClickTimer = setTimeout(() => {
                 secretClickCount = 0;
-            }, 1000);
+            }, 3000); // Increased from 1 second to 3 seconds for easier tapping
         }
     });
 }
