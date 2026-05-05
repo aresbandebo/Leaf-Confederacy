@@ -5,6 +5,7 @@ const ENTRY_INFO = 'entry.1474977758';
 
 let members = [];
 let posts = JSON.parse(localStorage.getItem('leafPosts')) || [];
+let stories = JSON.parse(localStorage.getItem('leafStories')) || [];
 
 const leavesDB = [
     { name: "Oak Leaf", emoji: "🍂", description: "A deeply lobed leaf from the mighty oak tree, often turning brilliant colors in the fall.", representation: "Strength, endurance, and deep, unshakeable roots within the community." },
@@ -142,6 +143,7 @@ async function fetchAndSyncMembers() {
                 
                 const sheetMembers = [];
                 const sheetPosts = [];
+                const sheetStories = [];
                 
                 rows.forEach(row => {
                     let timestamp = row[0] ? row[0].trim() : "";
@@ -154,6 +156,12 @@ async function fetchAndSyncMembers() {
                             content: info,
                             timestamp: timestamp
                         });
+                    } else if (name.startsWith("STORY: ")) {
+                        sheetStories.push({
+                            title: name.substring(7),
+                            content: info,
+                            timestamp: timestamp
+                        });
                     } else if (name !== "") {
                         sheetMembers.push({ name, info });
                     }
@@ -161,6 +169,7 @@ async function fetchAndSyncMembers() {
                 
                 members = [...sheetMembers];
                 posts = [...sheetPosts];
+                stories = [...sheetStories];
                 
                 // Auto-sync any locally signed-up users to the global Google Form
                 // and keep them visible on the screen if Google Sheets is still processing the CSV cache
@@ -196,8 +205,24 @@ async function fetchAndSyncMembers() {
                 
                 localStorage.setItem('leafPosts', JSON.stringify(pendingPosts));
                 
+                // Auto-sync any local stories
+                let localStories = JSON.parse(localStorage.getItem('leafStories')) || [];
+                let pendingStories = [];
+                
+                localStories.forEach(localStory => {
+                    const exists = sheetStories.find(ss => ss.title === localStory.title && ss.content === localStory.content);
+                    if (!exists) {
+                        submitToGoogleForm("STORY: " + localStory.title, localStory.content);
+                        stories.push(localStory);
+                        pendingStories.push(localStory);
+                    }
+                });
+                
+                localStorage.setItem('leafStories', JSON.stringify(pendingStories));
+                
                 renderMembers();
                 renderPosts();
+                renderStoryOfTheDay();
             }
         });
     } catch(err) {
@@ -311,6 +336,28 @@ function renderPosts() {
     });
 }
 
+// Render Story Of The Day
+function renderStoryOfTheDay() {
+    const titleEl = document.getElementById('story-title');
+    const dateEl = document.getElementById('story-date');
+    const contentEl = document.getElementById('story-content');
+    
+    if (stories.length === 0) {
+        titleEl.textContent = "No stories yet!";
+        dateEl.textContent = "";
+        contentEl.textContent = "Check back soon for our first daily story.";
+        return;
+    }
+    
+    // Grab the most recently submitted story
+    const latestStory = stories[stories.length - 1];
+    const date = typeof latestStory.timestamp === 'number' ? new Date(latestStory.timestamp).toLocaleDateString() : latestStory.timestamp;
+    
+    titleEl.textContent = latestStory.title;
+    dateEl.textContent = "Posted on " + date;
+    contentEl.innerHTML = escapeHTML(latestStory.content).replace(/\n/g, '<br>');
+}
+
 // Event Listeners for Forms
 document.getElementById('signupForm').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -356,6 +403,38 @@ document.getElementById('postForm').addEventListener('submit', (e) => {
     }
 });
 
+document.getElementById('adminLoginBtn').addEventListener('click', () => {
+    const pwd = prompt("Please enter the Admin Password:");
+    // Simple admin password lock
+    if (pwd === "LeafStory2026" || pwd === "Confederacy") {
+        document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('adminLoginBtn').style.display = 'none';
+    } else if (pwd !== null) {
+        alert("Incorrect password.");
+    }
+});
+
+document.getElementById('storyForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = document.getElementById('storyTitleInput').value;
+    const content = document.getElementById('storyContentInput').value;
+    
+    if (title && content) {
+        const newStory = { title, content, timestamp: Date.now() };
+        stories.push(newStory);
+        renderStoryOfTheDay();
+        
+        let localStories = JSON.parse(localStorage.getItem('leafStories')) || [];
+        localStories.push(newStory);
+        localStorage.setItem('leafStories', JSON.stringify(localStories));
+        
+        submitToGoogleForm("STORY: " + title, content);
+        
+        document.getElementById('storyForm').reset();
+        alert('The new Story of the Day has been published globally!');
+    }
+});
+
 // Helper Function for escaping HTML to prevent XSS
 function escapeHTML(str) {
     return str.replace(/[&<>'"]/g, 
@@ -373,4 +452,5 @@ function escapeHTML(str) {
 renderMembers();
 renderGames();
 renderPosts();
+renderStoryOfTheDay();
 renderLeafOfTheDay();
